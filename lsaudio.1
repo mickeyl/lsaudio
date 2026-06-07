@@ -108,6 +108,19 @@ Never prompt; fail instead. Useful for scripts.
 .TP
 .BR \-a ", " \-\-all
 Match among all registered audio processes, not only active ones.
+.TP
+.B \-\-sudo
+Escalate via
+.BR sudo (8)
+when a target process belongs to another user (e.g. the root-owned
+.IR systemsoundserverd ).
+Without this flag, an interactive
+.RB \(lq "Retry with sudo?" \(rq
+prompt is offered when permission is denied. sudo performs its own
+authentication; combined with
+.BR \-\-no\-input ,
+.B sudo \-n
+is used so that nothing ever waits for a password.
 .SH EXIT STATUS
 .B lsaudio kill
 exits with 0 on success, 1 if nothing matched, 2 if the operation was aborted

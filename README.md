@@ -68,8 +68,10 @@ lsaudio kill -n music    Dry-run: only show what would be signalled
 `kill` only matches *active* audio processes by default (pass `--all` to
 include idle clients), prompts before sending a signal (`--force` skips,
 `--no-input` fails instead — for scripts), and refuses to match its own
-process. Exit codes: `0` success, `1` nothing matched, `2` aborted, `3` a
-signal could not be delivered.
+process. When a target belongs to another user (root-owned daemons like
+`systemsoundserverd`), `lsaudio` offers to retry via `sudo` — or escalates
+directly with `--sudo`. Exit codes: `0` success, `1` nothing matched, `2`
+aborted, `3` a signal could not be delivered.
 
 ## How it works
 

@@ -40,6 +40,9 @@ struct Kill: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Match among all registered audio processes, not only active ones.")
     var all = false
 
+    @Flag(help: "Escalate via sudo when a target process belongs to another user.")
+    var sudo = false
+
     func validate() throws {
         // Without a target, --all would signal every registered audio client,
         // including system daemons like corespeechd — never what anyone wants.
@@ -76,16 +79,21 @@ struct Kill: ParsableCommand {
         }
 
         var failed = false
+        var denied: [AudioProcess] = []
         for match in matches {
             guard kill(match.pid, signalNumber) == 0 else {
-                failed = true
-                let reason = errno == EPERM
-                    ? "not permitted — the process belongs to another user (try sudo)"
-                    : String(cString: strerror(errno))
-                printError("Failed to send \(signalLabel) to \(match.described): \(reason)")
+                if errno == EPERM {
+                    denied.append(match)
+                } else {
+                    failed = true
+                    printError("Failed to send \(signalLabel) to \(match.described): \(String(cString: strerror(errno)))")
+                }
                 continue
             }
             print("Sent \(signalLabel) to \(match.described)")
+        }
+        if !denied.isEmpty, try !escalate(denied, signalNumber: signalNumber, signalLabel: signalLabel) {
+            failed = true
         }
         if failed { throw ExitCode(3) }
     }
@@ -122,6 +130,39 @@ struct Kill: ParsableCommand {
             printError("Aborted.")
             throw ExitCode(2)
         }
+    }
+
+    /// Root-owned audio daemons (e.g. systemsoundserverd) yield EPERM; retry those via sudo,
+    /// which handles authentication itself (password prompt or Touch ID).
+    private func escalate(_ denied: [AudioProcess], signalNumber: Int32, signalLabel: String) throws -> Bool {
+        for match in denied {
+            printError("Not permitted to signal \(match.described) — the process belongs to another user.")
+        }
+        if !sudo {
+            guard !noInput, isatty(STDIN_FILENO) == 1 else {
+                printError("Re-run with --sudo (or under sudo) to escalate.")
+                return false
+            }
+            FileHandle.standardError.write(Data("Retry with sudo? [y/N] ".utf8))
+            guard let answer = readLine()?.lowercased(), ["y", "yes"].contains(answer) else {
+                return false
+            }
+        }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+        // With --no-input, sudo must not sit waiting for a password (-n fails loudly instead).
+        let sudoFlags = noInput ? ["-n"] : []
+        process.arguments = sudoFlags + ["/bin/kill", "-\(signalNumber)"] + denied.map { String($0.pid) }
+        try process.run()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else {
+            printError("sudo kill exited with status \(process.terminationStatus).")
+            return false
+        }
+        for match in denied {
+            print("Sent \(signalLabel) to \(match.described) — as root")
+        }
+        return true
     }
 
     private func parsedSignal() throws -> (number: Int32, label: String) {
