@@ -16,7 +16,7 @@ lsaudio \- list the processes that are currently playing or recording audio
 .RB [ \-n ]
 .RB [ \-a ]
 .RB [ \-\-no\-input ]
-.I target
+.RI [ target ]
 .br
 .B lsaudio
 .B \-\-version
@@ -83,6 +83,15 @@ audio processes are matched, so a stray
 .BR afplay (1)
 can be ended without hitting idle audio clients. A confirmation prompt is
 shown before any signal is sent.
+.PP
+Without a
+.IR target ,
+every active audio process is matched \(em
+.B lsaudio kill
+simply makes the noise stop. Combining this with
+.B \-\-all
+is refused, since it would signal every registered audio client, including
+system daemons.
 .TP
 .BR \-s ", " \-\-signal " " \fIsignal\fR
 Signal to send, as name or number (default: TERM). Supported names: CONT,

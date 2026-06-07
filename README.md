@@ -60,6 +60,7 @@ lsaudio --json           Machine-readable output
 lsaudio --plain          Tab-separated output (automatic when piped)
 lsaudio --watch          Live view; emits start/stop events when piped
 lsaudio kill afplay      Send SIGTERM to active audio processes matching «afplay»
+lsaudio kill             Make the noise stop: match every active audio process
 lsaudio kill -s KILL 642 Send SIGKILL to PID 642
 lsaudio kill -n music    Dry-run: only show what would be signalled
 ```

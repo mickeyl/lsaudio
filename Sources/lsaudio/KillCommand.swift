@@ -7,7 +7,9 @@ struct Kill: ParsableCommand {
         abstract: "Send a signal to audio processes matching a PID, bundle ID, or name.",
         discussion: """
         By default only processes that are actively playing or recording are matched, \
-        so a stray «afplay» can be ended without hitting idle audio clients.
+        so a stray «afplay» can be ended without hitting idle audio clients. \
+        Without a target, every active audio process is matched — «lsaudio kill» \
+        simply makes the noise stop.
 
         Exit status: 0 on success, 1 if nothing matched, 2 if aborted or \
         confirmation was impossible, 3 if sending a signal failed.
@@ -19,8 +21,8 @@ struct Kill: ParsableCommand {
         "TERM": SIGTERM, "USR1": SIGUSR1, "USR2": SIGUSR2, "STOP": SIGSTOP, "CONT": SIGCONT,
     ]
 
-    @Argument(help: "A PID, a bundle ID, or a case-insensitive name substring.")
-    var target: String
+    @Argument(help: "A PID, a bundle ID, or a case-insensitive name substring. Omit to match every active audio process.")
+    var target: String?
 
     @Option(name: [.customShort("s"), .customLong("signal")],
             help: "Signal to send, as name or number (e.g. TERM, KILL, 9).")
@@ -38,15 +40,27 @@ struct Kill: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Match among all registered audio processes, not only active ones.")
     var all = false
 
+    func validate() throws {
+        // Without a target, --all would signal every registered audio client,
+        // including system daemons like corespeechd — never what anyone wants.
+        guard !(all && target == nil) else {
+            throw ValidationError("Refusing to signal every registered audio client. Give a target, or omit --all to address only active processes.")
+        }
+    }
+
     func run() throws {
         let (signalNumber, signalLabel) = try parsedSignal()
         let matches = Self.matches(for: target, all: all)
 
         guard !matches.isEmpty else {
-            printError("No \(all ? "registered" : "active") audio process matches «\(target)».")
-            printError(all
-                ? "Run «lsaudio --all» to see what is registered."
-                : "Pass --all to also match idle audio clients.")
+            if let target {
+                printError("No \(all ? "registered" : "active") audio process matches «\(target)».")
+                printError(all
+                    ? "Run «lsaudio --all» to see what is registered."
+                    : "Pass --all to also match idle audio clients.")
+            } else {
+                printError("No processes are currently playing or recording audio.")
+            }
             throw ExitCode(1)
         }
 
@@ -76,15 +90,19 @@ struct Kill: ParsableCommand {
         if failed { throw ExitCode(3) }
     }
 
-    static func matches(for target: String, all: Bool) -> [AudioProcess] {
+    static func matches(for target: String?, all: Bool) -> [AudioProcess] {
         let candidates = List.selectedProcesses(all: all, pattern: nil)
-        let matched: [AudioProcess] = if let pid = pid_t(target) {
-            candidates.filter { $0.pid == pid }
-        } else {
-            candidates.filter {
-                $0.name.localizedCaseInsensitiveContains(target)
-                    || ($0.bundleID?.localizedCaseInsensitiveContains(target) ?? false)
+        let matched: [AudioProcess] = if let target {
+            if let pid = pid_t(target) {
+                candidates.filter { $0.pid == pid }
+            } else {
+                candidates.filter {
+                    $0.name.localizedCaseInsensitiveContains(target)
+                        || ($0.bundleID?.localizedCaseInsensitiveContains(target) ?? false)
+                }
             }
+        } else {
+            candidates
         }
         // Never offer to kill ourselves, even if the pattern matches.
         return matched.filter { $0.pid != getpid() }
