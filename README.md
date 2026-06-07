@@ -97,14 +97,30 @@ Two notorious indirections, learned the hard way:
   notification sounds on your host audio. Killing it is futile — launchd
   respawns it. `xcrun simctl shutdown all` is your friend.
 
-## Install
+## Installing
+
+### Homebrew
+
+```
+brew tap mickeyl/formulae
+brew install lsaudio
+```
+
+### Mint
+
+```
+mint install mickeyl/lsaudio
+```
+
+### From source
 
 ```
 make install            # builds and installs to ~/.local (binary + man page)
 make install PREFIX=/usr/local
 ```
 
-Uninstall with `make uninstall` (same `PREFIX`).
+Uninstall with `brew uninstall lsaudio`, `mint uninstall lsaudio`, or
+`make uninstall` (same `PREFIX`), depending on how you installed.
 
 ## Requirements
 
