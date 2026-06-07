@@ -1,0 +1,129 @@
+.TH LSAUDIO 1 "2026-06-07" "lsaudio 1.0.0" "User Commands"
+.SH NAME
+lsaudio \- list the processes that are currently playing or recording audio
+.SH SYNOPSIS
+.B lsaudio
+.RB [ \-a ]
+.RB [ \-j | \-p ]
+.RB [ \-w ]
+.RB [ \-\-no\-color ]
+.RI [ pattern ]
+.br
+.B lsaudio kill
+.RB [ \-s
+.IR signal ]
+.RB [ \-f ]
+.RB [ \-n ]
+.RB [ \-a ]
+.RB [ \-\-no\-input ]
+.I target
+.br
+.B lsaudio
+.B \-\-version
+.SH DESCRIPTION
+.B lsaudio
+enumerates every client process registered with
+.BR coreaudiod (8)
+via the CoreAudio process object API (macOS 14+) and shows which of them are
+currently playing or recording audio, together with their PID, bundle ID, and
+the audio devices in use.
+.PP
+By default only active processes are listed. With
+.BR \-a " / " \-\-all ,
+every registered audio client is shown and idle ones are dimmed.
+An optional
+.I pattern
+restricts the list to processes whose name or bundle ID contains the given
+text (case-insensitive).
+.PP
+Note that browsers and Electron apps play audio from a helper process
+(e.g.\&
+.IR com.apple.WebKit.GPU
+for Safari), not from the main application process.
+.B lsaudio
+shows the process that actually holds the audio session.
+.SH LIST OPTIONS
+.TP
+.BR \-a ", " \-\-all
+Show every process registered with coreaudiod, including idle ones.
+.TP
+.BR \-j ", " \-\-json
+Output JSON.
+.TP
+.BR \-p ", " \-\-plain
+Output plain tab-separated text. This is also the automatic behavior when
+stdout is not a terminal.
+.TP
+.BR \-w ", " \-\-watch
+Watch for changes. On a terminal, the table is redrawn whenever audio
+activity changes; when piped (or combined with
+.BR \-\-plain ),
+one tab-separated event line is emitted per change
+.RI ( present ,
+.IR start ,
+.IR change ,
+.IR stop ).
+This mode is event-driven via CoreAudio property listeners; no polling takes
+place.
+.TP
+.B \-\-no\-color
+Disable colored output. The
+.B NO_COLOR
+environment variable and
+.B TERM=dumb
+are honored as well.
+.SH KILL
+.B lsaudio kill
+sends a signal to audio processes matching
+.IR target ,
+which may be a PID, a bundle ID, or a case-insensitive name substring.
+By default only
+.I active
+audio processes are matched, so a stray
+.BR afplay (1)
+can be ended without hitting idle audio clients. A confirmation prompt is
+shown before any signal is sent.
+.TP
+.BR \-s ", " \-\-signal " " \fIsignal\fR
+Signal to send, as name or number (default: TERM). Supported names: CONT,
+HUP, INT, KILL, QUIT, STOP, TERM, USR1, USR2.
+.TP
+.BR \-f ", " \-\-force
+Skip the confirmation prompt.
+.TP
+.BR \-n ", " \-\-dry\-run
+Only show what would be signalled.
+.TP
+.B \-\-no\-input
+Never prompt; fail instead. Useful for scripts.
+.TP
+.BR \-a ", " \-\-all
+Match among all registered audio processes, not only active ones.
+.SH EXIT STATUS
+.B lsaudio kill
+exits with 0 on success, 1 if nothing matched, 2 if the operation was aborted
+or confirmation was impossible, and 3 if a signal could not be delivered.
+.B lsaudio --watch
+exits with 130 on Ctrl-C.
+.SH EXAMPLES
+.TP
+List processes currently playing or recording audio:
+.B lsaudio
+.TP
+Live view of audio activity:
+.B lsaudio --watch
+.TP
+Log audio start/stop events to a file:
+.B lsaudio --watch --plain >> audio-activity.log
+.TP
+End a stray afplay left behind by a careless agent:
+.B lsaudio kill afplay
+.TP
+Force-kill whatever Safari is playing:
+.B lsaudio kill -s KILL -f WebKit.GPU
+.SH SEE ALSO
+.BR kill (1),
+.BR afplay (1),
+.BR coreaudiod (8)
+.SH AUTHOR
+Dr. Michael Lauer <mickey@vanille.de>
