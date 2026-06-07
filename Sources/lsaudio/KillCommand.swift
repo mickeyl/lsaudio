@@ -185,7 +185,9 @@ struct Kill: ParsableCommand {
 
 private extension AudioProcess {
     var described: String {
-        let bundle = bundleID.map { " (\($0))" } ?? ""
-        return "\(name)\(bundle), PID \(pid) — \(activityDescription)"
+        // Without a bundle ID, the executable path is the next-best identity hint
+        // (it unmasks e.g. simulator daemons under /Library/Developer/CoreSimulator).
+        let origin = (bundleID ?? executablePath).map { " (\($0))" } ?? ""
+        return "\(name)\(origin), PID \(pid) — \(activityDescription)"
     }
 }

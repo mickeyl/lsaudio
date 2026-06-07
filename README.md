@@ -56,6 +56,7 @@ what just made that sound:
 lsaudio                  Processes currently playing or recording audio
 lsaudio --all            Every process registered with coreaudiod, idle ones dimmed
 lsaudio safari           Filter by name or bundle ID substring
+lsaudio -x               Include executable paths — unmasks anonymous helpers
 lsaudio --json           Machine-readable output
 lsaudio --plain          Tab-separated output (automatic when piped)
 lsaudio --watch          Live view; emits start/stop events when piped
@@ -85,6 +86,16 @@ CoreAudio property listeners.
 Note that audio in browsers and Electron apps plays from a helper process
 (e.g. `com.apple.WebKit.GPU` for Safari), not from the main app — `lsaudio`
 shows the process that actually holds the audio session.
+
+Two notorious indirections, learned the hard way:
+
+- System sounds (notification plings, alerts) are *brokered*: apps ask
+  `systemsoundserverd` to play them, so the audio session belongs to the
+  daemon, not the noisy app.
+- A `systemsoundserver-simd` whose executable path (see `-x`) lives under
+  `/Library/Developer/CoreSimulator` is a **booted simulator** playing its
+  notification sounds on your host audio. Killing it is futile — launchd
+  respawns it. `xcrun simctl shutdown all` is your friend.
 
 ## Install
 

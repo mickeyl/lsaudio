@@ -8,6 +8,7 @@ import Foundation
 final class Watcher {
     private let all: Bool
     private let pattern: String?
+    private let paths: Bool
     private let plainEvents: Bool
     private let style: OutputStyle
     private let queue = DispatchQueue(label: "lsaudio.watch")
@@ -21,9 +22,10 @@ final class Watcher {
         self?.scheduleRefresh()
     }
 
-    init(all: Bool, pattern: String?, plainEvents: Bool, style: OutputStyle) {
+    init(all: Bool, pattern: String?, paths: Bool, plainEvents: Bool, style: OutputStyle) {
         self.all = all
         self.pattern = pattern
+        self.paths = paths
         self.plainEvents = plainEvents
         self.style = style
     }
@@ -85,7 +87,7 @@ final class Watcher {
         screen += style.dimmed("lsaudio — watching audio activity, Ctrl-C to stop") + "\n\n"
         screen += processes.isEmpty
             ? "No processes are currently playing or recording audio."
-            : ProcessRenderer.table(for: processes, style: style)
+            : ProcessRenderer.table(for: processes, style: style, paths: paths)
         print(screen)
         fflush(stdout)
     }

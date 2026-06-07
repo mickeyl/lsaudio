@@ -7,6 +7,7 @@ struct AudioProcess {
     let pid: pid_t
     let name: String
     let bundleID: String?
+    let executablePath: String?
     let isRunningOutput: Bool
     let isRunningInput: Bool
     let deviceNames: [String]
@@ -31,6 +32,12 @@ struct AudioProcess {
         self.objectID = objectID
         self.pid = pid
         self.bundleID = (bundleID?.isEmpty ?? true) ? nil : bundleID
+        // The executable path unmasks anonymous helpers, e.g. simulator daemons under /Library/Developer/CoreSimulator.
+        var pathBuffer = [CChar](repeating: 0, count: 4 * Int(MAXPATHLEN))
+        let executablePath = proc_pidpath(pid, &pathBuffer, UInt32(pathBuffer.count)) > 0
+            ? String(cString: pathBuffer)
+            : nil
+        self.executablePath = executablePath
         self.isRunningOutput = CoreAudioProperty.bool(of: objectID, selector: kAudioProcessPropertyIsRunningOutput)
         self.isRunningInput = CoreAudioProperty.bool(of: objectID, selector: kAudioProcessPropertyIsRunningInput)
         // The scope selects the output vs. input device list, so query both and merge.
@@ -40,7 +47,7 @@ struct AudioProcess {
         self.deviceNames = deviceIDs
             .filter { seen.insert($0).inserted }
             .compactMap { CoreAudioProperty.string(of: $0, selector: kAudioObjectPropertyName) }
-        self.name = Self.processName(for: pid, bundleID: self.bundleID)
+        self.name = Self.processName(for: pid, bundleID: self.bundleID, executablePath: executablePath)
     }
 
     /// All coreaudiod clients, active ones first.
@@ -53,14 +60,18 @@ struct AudioProcess {
             }
     }
 
-    private static func processName(for pid: pid_t, bundleID: String?) -> String {
-        // NSRunningApplication yields the localized app name; plain daemons fall back to the kernel's process name.
+    private static func processName(for pid: pid_t, bundleID: String?, executablePath: String?) -> String {
+        // NSRunningApplication yields the localized app name; plain daemons fall back to the kernel's
+        // process name, and some system daemons only reveal themselves via their executable path.
         if let app = NSRunningApplication(processIdentifier: pid), let name = app.localizedName {
             return name
         }
         var buffer = [CChar](repeating: 0, count: Int(MAXPATHLEN))
         if proc_name(pid, &buffer, UInt32(buffer.count)) > 0 {
             return String(cString: buffer)
+        }
+        if let basename = executablePath?.split(separator: "/").last {
+            return String(basename)
         }
         return bundleID ?? "?"
     }

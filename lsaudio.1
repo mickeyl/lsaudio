@@ -66,6 +66,15 @@ one tab-separated event line is emitted per change
 This mode is event-driven via CoreAudio property listeners; no polling takes
 place.
 .TP
+.BR \-x ", " \-\-paths
+Show each process's executable path as an additional column. This unmasks
+anonymous helpers \(em a
+.I systemsoundserver-simd
+living under
+.I /Library/Developer/CoreSimulator
+is a booted simulator playing its notification sounds on the host, not the
+macOS system sound server. JSON output always includes the path.
+.TP
 .B \-\-no\-color
 Disable colored output. The
 .B NO_COLOR

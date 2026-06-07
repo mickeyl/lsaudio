@@ -3,8 +3,8 @@ import Foundation
 /// Renders audio process snapshots as table, plain text, or JSON.
 enum ProcessRenderer {
 
-    static func table(for processes: [AudioProcess], style: OutputStyle) -> String {
-        let headers = ["PID", "Process", "Bundle ID", "Out", "In", "Devices"]
+    static func table(for processes: [AudioProcess], style: OutputStyle, paths: Bool = false) -> String {
+        let headers = ["PID", "Process", "Bundle ID", "Out", "In", "Devices"] + (paths ? ["Path"] : [])
         let rows = processes.map { process -> [Table.Cell] in
             let rowPrefix = process.isActive ? nil : style.dimPrefix
             return [
@@ -16,21 +16,21 @@ enum ProcessRenderer {
                 Table.Cell(process.isRunningInput ? "●" : "·",
                            ansiPrefix: process.isRunningInput ? style.redPrefix : style.dimPrefix),
                 Table.Cell(process.deviceNames.joined(separator: ", "), ansiPrefix: rowPrefix),
-            ]
+            ] + (paths ? [Table.Cell(process.executablePath ?? "—", ansiPrefix: rowPrefix)] : [])
         }
         return Table(headers: headers, rows: rows).rendered()
     }
 
-    static func plain(for processes: [AudioProcess]) -> String {
+    static func plain(for processes: [AudioProcess], paths: Bool = false) -> String {
         processes.map { process in
-            [
+            ([
                 String(process.pid),
                 process.name,
                 process.bundleID ?? "-",
                 process.isRunningOutput ? "yes" : "no",
                 process.isRunningInput ? "yes" : "no",
                 process.deviceNames.joined(separator: ","),
-            ].joined(separator: "\t")
+            ] + (paths ? [process.executablePath ?? "-"] : [])).joined(separator: "\t")
         }.joined(separator: "\n")
     }
 
@@ -40,6 +40,7 @@ enum ProcessRenderer {
                 pid: process.pid,
                 name: process.name,
                 bundleID: process.bundleID,
+                path: process.executablePath,
                 runningOutput: process.isRunningOutput,
                 runningInput: process.isRunningInput,
                 devices: process.deviceNames
@@ -54,6 +55,7 @@ enum ProcessRenderer {
         let pid: pid_t
         let name: String
         let bundleID: String?
+        let path: String?
         let runningOutput: Bool
         let runningInput: Bool
         let devices: [String]

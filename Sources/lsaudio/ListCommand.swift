@@ -21,6 +21,10 @@ struct List: ParsableCommand {
     @Flag(name: [.customShort("w"), .long], help: "Watch for changes: redraw on a TTY, emit events when piped.")
     var watch = false
 
+    @Flag(name: [.customShort("x"), .long],
+          help: "Show the executable path — unmasks anonymous helpers like simulator daemons.")
+    var paths = false
+
     @Flag(name: [.customLong("no-color")], help: "Disable colored output.")
     var noColor = false
 
@@ -33,7 +37,7 @@ struct List: ParsableCommand {
         let style = OutputStyle(noColorFlag: noColor)
 
         if watch {
-            Watcher(all: all, pattern: pattern, plainEvents: plain || !style.colorized, style: style).run()
+            Watcher(all: all, pattern: pattern, paths: paths, plainEvents: plain || !style.colorized, style: style).run()
         }
 
         let processes = Self.selectedProcesses(all: all, pattern: pattern)
@@ -44,14 +48,14 @@ struct List: ParsableCommand {
         }
         if plain || isatty(STDOUT_FILENO) != 1 {
             guard !processes.isEmpty else { return }
-            print(ProcessRenderer.plain(for: processes))
+            print(ProcessRenderer.plain(for: processes, paths: paths))
             return
         }
         guard !processes.isEmpty else {
             print(emptyMessage)
             return
         }
-        print(ProcessRenderer.table(for: processes, style: style))
+        print(ProcessRenderer.table(for: processes, style: style, paths: paths))
     }
 
     static func selectedProcesses(all: Bool, pattern: String?) -> [AudioProcess] {
