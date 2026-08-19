@@ -1,2 +1,5 @@
 .build/
 .DS_Store
+macOS/LSAudio.xcodeproj/
+macOS/DerivedData/
+macOS/Dist/

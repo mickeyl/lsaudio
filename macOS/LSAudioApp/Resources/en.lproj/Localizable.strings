@@ -1,0 +1,105 @@
+"App_NAME" = "LSAudio";
+"App_PROCESSES_WINDOW" = "Audio Processes";
+"MenuBar_COUNT_ACCESSIBILITY" = "%@ playing, %@ recording";
+"Count_ACTIVE" = "%d active";
+"Count_PLAYING" = "%d playing";
+"Count_RECORDING" = "%d recording";
+"Count_REGISTERED" = "%d registered";
+
+"Activity_IDLE" = "Idle";
+"Activity_PLAYING" = "Playing";
+"Activity_RECORDING" = "Recording";
+"Activity_PLAYING_RECORDING" = "Playing and recording";
+"Event_PRESENT" = "Present";
+"Event_START" = "Started";
+"Event_CHANGE" = "Changed";
+"Event_STOP" = "Stopped";
+
+"Common_CANCEL" = "Cancel";
+"Common_CLEAR" = "Clear";
+"Common_COPY" = "Copy";
+"Common_DONE" = "Done";
+"Common_EXPORT" = "Export";
+"Common_OPEN_WINDOW" = "Show All Processes…";
+"Common_QUIT" = "Quit";
+"Common_REFRESH" = "Refresh";
+"Common_SETTINGS" = "Settings";
+"Common_SHOW_IDLE" = "Show idle clients";
+"Common_SHOW_PATHS" = "Show executable paths";
+
+"Status_LOADING" = "Reading CoreAudio…";
+"Status_LAST_UPDATED" = "Updated %@";
+"Status_NO_ACTIVE" = "No process is currently playing or recording audio.";
+"Status_NO_OUTPUT" = "No process is currently playing audio.";
+"Status_NO_INPUT" = "No process is currently recording audio.";
+"Status_NO_RESULTS" = "No audio process matches the current filter.";
+"Status_MONITOR_NOTE" = "CoreAudio notifications keep this list current without polling.";
+
+"Scope_PLAYING" = "Playing";
+"Scope_RECORDING" = "Recording";
+"Sidebar_PROCESSES" = "Processes";
+"Sidebar_EVENTS" = "Event History";
+"Search_PROMPT" = "Filter by process name, bundle ID, PID, device, or path";
+
+"Table_PROCESS" = "Process";
+"Table_PID" = "PID";
+"Table_BUNDLE_ID" = "Bundle ID";
+"Table_OUTPUT" = "Output";
+"Table_INPUT" = "Input";
+"Table_DEVICES" = "Devices";
+"Table_PATH" = "Executable Path";
+"Table_TIME" = "Time";
+"Table_EVENT" = "Event";
+
+"Inspector_IDENTITY" = "Identity";
+"Inspector_ACTIVITY" = "Activity";
+"Inspector_AUDIO_DEVICES" = "Audio Devices";
+"Inspector_NO_DEVICES" = "No device reported";
+"Inspector_BUNDLE_ID" = "Bundle ID";
+"Inspector_EXECUTABLE" = "Executable";
+
+"Settings_GENERAL" = "General";
+"Settings_SORT_BY" = "Sort by";
+"Settings_SORT_ACTIVITY" = "Activity";
+"Settings_SORT_ALPHABETICAL" = "Alphabetically";
+"Settings_SORT_PID" = "Process ID";
+"Settings_SORT_DEVICE" = "Audio device";
+"Settings_IDLE_NOTE" = "Idle clients are registered with coreaudiod but are not currently using audio.";
+"Settings_CONFIRM_QUICK_TERMINATION" = "Confirm before SIGTERM";
+"Settings_CONFIRM_QUICK_TERMINATION_NOTE" = "Applies to the quick terminate button in the menu bar panel.";
+"Settings_CREDITS" = "(C) Dr. Michael 'Mickey' Lauer – made with love in Neu-Isenburg – [https://www.vanille.de](https://www.vanille.de)";
+
+"Signal_ACTION" = "Send Signal…";
+"Signal_CONFIRM_ACTION" = "Send SIGTERM";
+"Signal_CONFIRM_MESSAGE" = "This asks %@ (PID %d) to terminate.";
+"Signal_CONFIRM_TITLE" = "Send SIGTERM?";
+"Signal_QUICK_TERMINATE" = "Terminate %@ (SIGTERM)";
+"Signal_STOP_ALL" = "Stop All Active Audio…";
+"Signal_TITLE" = "Signal Audio Processes";
+"Signal_TARGET" = "Target";
+"Signal_TARGET_PLACEHOLDER" = "PID, bundle ID, or name; empty means all active";
+"Signal_SIGNAL" = "Signal";
+"Signal_INCLUDE_IDLE" = "Include idle clients";
+"Signal_DRY_RUN" = "Dry run";
+"Signal_AUTHORIZE" = "Authorize administrator access if required";
+"Signal_MATCHES" = "%d matching processes";
+"Signal_MATCH_ONE" = "1 matching process";
+"Signal_NO_MATCH" = "No matching process";
+"Signal_SEND" = "Send %@";
+"Signal_PREVIEW" = "Preview";
+"Signal_SENT" = "Sent %@ to %d processes.";
+"Signal_SENT_ONE" = "Sent %@ to 1 process.";
+"Signal_DRY_RESULT" = "Dry run: %@ would be sent to %d processes.";
+"Signal_REFUSE_ALL_IDLE" = "Enter a target before including every registered audio client.";
+"Signal_PERMISSION_DENIED" = "Administrator authorization is required for: %@";
+"Signal_FAILED" = "Could not signal: %@";
+
+"Export_COPY_JSON" = "Copy JSON";
+"Export_COPY_PLAIN" = "Copy Plain Text";
+"Export_JSON" = "Export JSON…";
+"Export_PLAIN" = "Export Plain Text…";
+"Export_COPY_EVENTS" = "Copy Event Log";
+"Export_EVENTS" = "Export Event Log…";
+
+"Error_TITLE" = "LSAudio Error";
+"Error_DISMISS" = "OK";

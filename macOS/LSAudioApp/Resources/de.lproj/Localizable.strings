@@ -1,0 +1,105 @@
+"App_NAME" = "LSAudio";
+"App_PROCESSES_WINDOW" = "Audio-Prozesse";
+"MenuBar_COUNT_ACCESSIBILITY" = "%@ mit Wiedergabe, %@ mit Aufnahme";
+"Count_ACTIVE" = "%d aktiv";
+"Count_PLAYING" = "%d mit Wiedergabe";
+"Count_RECORDING" = "%d mit Aufnahme";
+"Count_REGISTERED" = "%d registriert";
+
+"Activity_IDLE" = "Inaktiv";
+"Activity_PLAYING" = "Wiedergabe";
+"Activity_RECORDING" = "Aufnahme";
+"Activity_PLAYING_RECORDING" = "Wiedergabe und Aufnahme";
+"Event_PRESENT" = "Vorhanden";
+"Event_START" = "Gestartet";
+"Event_CHANGE" = "Geändert";
+"Event_STOP" = "Gestoppt";
+
+"Common_CANCEL" = "Abbrechen";
+"Common_CLEAR" = "Leeren";
+"Common_COPY" = "Kopieren";
+"Common_DONE" = "Fertig";
+"Common_EXPORT" = "Exportieren";
+"Common_OPEN_WINDOW" = "Alle Prozesse anzeigen…";
+"Common_QUIT" = "Beenden";
+"Common_REFRESH" = "Aktualisieren";
+"Common_SETTINGS" = "Einstellungen";
+"Common_SHOW_IDLE" = "Inaktive Clients anzeigen";
+"Common_SHOW_PATHS" = "Programmpfade anzeigen";
+
+"Status_LOADING" = "CoreAudio wird gelesen…";
+"Status_LAST_UPDATED" = "Aktualisiert %@";
+"Status_NO_ACTIVE" = "Derzeit gibt kein Prozess Audio wieder oder nimmt Audio auf.";
+"Status_NO_OUTPUT" = "Derzeit gibt kein Prozess Audio wieder.";
+"Status_NO_INPUT" = "Derzeit nimmt kein Prozess Audio auf.";
+"Status_NO_RESULTS" = "Kein Audio-Prozess entspricht dem aktuellen Filter.";
+"Status_MONITOR_NOTE" = "CoreAudio-Mitteilungen halten die Liste ohne Polling aktuell.";
+
+"Scope_PLAYING" = "Wiedergabe";
+"Scope_RECORDING" = "Aufnahme";
+"Sidebar_PROCESSES" = "Prozesse";
+"Sidebar_EVENTS" = "Ereignisverlauf";
+"Search_PROMPT" = "Nach Prozessname, Bundle-ID, PID, Gerät oder Pfad filtern";
+
+"Table_PROCESS" = "Prozess";
+"Table_PID" = "PID";
+"Table_BUNDLE_ID" = "Bundle-ID";
+"Table_OUTPUT" = "Ausgabe";
+"Table_INPUT" = "Eingabe";
+"Table_DEVICES" = "Geräte";
+"Table_PATH" = "Programmpfad";
+"Table_TIME" = "Zeit";
+"Table_EVENT" = "Ereignis";
+
+"Inspector_IDENTITY" = "Identität";
+"Inspector_ACTIVITY" = "Aktivität";
+"Inspector_AUDIO_DEVICES" = "Audiogeräte";
+"Inspector_NO_DEVICES" = "Kein Gerät gemeldet";
+"Inspector_BUNDLE_ID" = "Bundle-ID";
+"Inspector_EXECUTABLE" = "Programmdatei";
+
+"Settings_GENERAL" = "Allgemein";
+"Settings_SORT_BY" = "Sortieren nach";
+"Settings_SORT_ACTIVITY" = "Aktivität";
+"Settings_SORT_ALPHABETICAL" = "Alphabetisch";
+"Settings_SORT_PID" = "Prozess-ID";
+"Settings_SORT_DEVICE" = "Audiogerät";
+"Settings_IDLE_NOTE" = "Inaktive Clients sind bei coreaudiod registriert, verwenden aber derzeit kein Audio.";
+"Settings_CONFIRM_QUICK_TERMINATION" = "Vor SIGTERM bestätigen";
+"Settings_CONFIRM_QUICK_TERMINATION_NOTE" = "Gilt für die Schnellaktion im Menüleistenfenster.";
+"Settings_CREDITS" = "(C) Dr. Michael 'Mickey' Lauer – made with love in Neu-Isenburg – [https://www.vanille.de](https://www.vanille.de)";
+
+"Signal_ACTION" = "Signal senden…";
+"Signal_CONFIRM_ACTION" = "SIGTERM senden";
+"Signal_CONFIRM_MESSAGE" = "Damit wird %@ (PID %d) zum Beenden aufgefordert.";
+"Signal_CONFIRM_TITLE" = "SIGTERM senden?";
+"Signal_QUICK_TERMINATE" = "%@ beenden (SIGTERM)";
+"Signal_STOP_ALL" = "Alle aktiven Audio-Prozesse stoppen…";
+"Signal_TITLE" = "Signal an Audio-Prozesse senden";
+"Signal_TARGET" = "Ziel";
+"Signal_TARGET_PLACEHOLDER" = "PID, Bundle-ID oder Name; leer bedeutet alle aktiven";
+"Signal_SIGNAL" = "Signal";
+"Signal_INCLUDE_IDLE" = "Inaktive Clients einbeziehen";
+"Signal_DRY_RUN" = "Probelauf";
+"Signal_AUTHORIZE" = "Bei Bedarf Administratorzugriff autorisieren";
+"Signal_MATCHES" = "%d passende Prozesse";
+"Signal_MATCH_ONE" = "1 passender Prozess";
+"Signal_NO_MATCH" = "Kein passender Prozess";
+"Signal_SEND" = "%@ senden";
+"Signal_PREVIEW" = "Vorschau";
+"Signal_SENT" = "%@ wurde an %d Prozesse gesendet.";
+"Signal_SENT_ONE" = "%@ wurde an 1 Prozess gesendet.";
+"Signal_DRY_RESULT" = "Probelauf: %@ würde an %d Prozesse gesendet.";
+"Signal_REFUSE_ALL_IDLE" = "Gib ein Ziel ein, bevor alle registrierten Audio-Clients einbezogen werden.";
+"Signal_PERMISSION_DENIED" = "Administratorautorisierung wird benötigt für: %@";
+"Signal_FAILED" = "Signal konnte nicht gesendet werden: %@";
+
+"Export_COPY_JSON" = "JSON kopieren";
+"Export_COPY_PLAIN" = "Klartext kopieren";
+"Export_JSON" = "JSON exportieren…";
+"Export_PLAIN" = "Klartext exportieren…";
+"Export_COPY_EVENTS" = "Ereignisprotokoll kopieren";
+"Export_EVENTS" = "Ereignisprotokoll exportieren…";
+
+"Error_TITLE" = "LSAudio-Fehler";
+"Error_DISMISS" = "OK";

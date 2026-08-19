@@ -4,6 +4,10 @@ A zero-dependency CLI for macOS that answers one question: **who is making
 noise right now?** It lists every process that is currently playing or
 recording audio — and can selectively kill the culprits.
 
+The repository also contains **LSAudio for macOS**, a native macOS 26 menu-bar
+app. It uses the same CoreAudio discovery and filtering module as the CLI and
+provides its complete functionality through a professional SwiftUI interface.
+
 ## Motivation
 
 It rattles, it dings, it pings. Modern systems (and, let's be honest,
@@ -97,6 +101,34 @@ Two notorious indirections, learned the hard way:
   notification sounds on your host audio. Killing it is futile — launchd
   respawns it. `xcrun simctl shutdown all` is your friend.
 
+## Native macOS menu-bar app
+
+The app lives in [`macOS/`](macOS/README.md) and performs an initial CoreAudio
+scan as soon as it launches. Its menu-bar label shows the number of processes
+playing and recording as `output·input`; CoreAudio property listeners keep the
+label, popover, process table, and event history current without polling.
+
+The compact panel separates playback and recording activity. The full process
+window adds registered idle clients, search, executable paths, process details,
+plain and JSON export, CLI-compatible watch events, and signal delivery by PID,
+bundle ID, or name. Named and numeric signals, dry runs, all-active matching,
+and administrator authorization for protected processes are supported.
+
+<p align="center">
+  <img src="docs/images/lsaudio-menubar.png" alt="LSAudio for macOS menu-bar popover showing processes currently playing audio and quick termination controls" width="390">
+</p>
+
+For local development, install XcodeGen and Shark, then use:
+
+```bash
+make mac-build
+make mac-test
+make mac-run
+```
+
+The interface follows the system Light or Dark appearance and uses only the
+macOS system typeface.
+
 ## Installing
 
 ### Homebrew
@@ -104,6 +136,7 @@ Two notorious indirections, learned the hard way:
 ```
 brew tap mickeyl/formulae
 brew install lsaudio
+brew install --cask lsaudio-menubar
 ```
 
 ### Mint

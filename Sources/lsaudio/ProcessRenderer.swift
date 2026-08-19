@@ -1,4 +1,5 @@
 import Foundation
+import LSAudioCore
 
 /// Renders audio process snapshots as table, plain text, or JSON.
 enum ProcessRenderer {
@@ -22,42 +23,10 @@ enum ProcessRenderer {
     }
 
     static func plain(for processes: [AudioProcess], paths: Bool = false) -> String {
-        processes.map { process in
-            ([
-                String(process.pid),
-                process.name,
-                process.bundleID ?? "-",
-                process.isRunningOutput ? "yes" : "no",
-                process.isRunningInput ? "yes" : "no",
-                process.deviceNames.joined(separator: ","),
-            ] + (paths ? [process.executablePath ?? "-"] : [])).joined(separator: "\t")
-        }.joined(separator: "\n")
+        AudioProcessExport.plain(processes, includePaths: paths)
     }
 
     static func json(for processes: [AudioProcess]) throws -> String {
-        let entries = processes.map { process in
-            JSONProcess(
-                pid: process.pid,
-                name: process.name,
-                bundleID: process.bundleID,
-                path: process.executablePath,
-                runningOutput: process.isRunningOutput,
-                runningInput: process.isRunningInput,
-                devices: process.deviceNames
-            )
-        }
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        return String(decoding: try encoder.encode(entries), as: UTF8.self)
-    }
-
-    private struct JSONProcess: Encodable {
-        let pid: pid_t
-        let name: String
-        let bundleID: String?
-        let path: String?
-        let runningOutput: Bool
-        let runningInput: Bool
-        let devices: [String]
+        try AudioProcessExport.json(processes)
     }
 }

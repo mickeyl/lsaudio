@@ -1,0 +1,78 @@
+name: LSAudio
+
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "26.0"
+  groupSortPosition: top
+
+settings:
+  base:
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+
+targets:
+  LSAudioCore:
+    type: framework
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: ../Sources/LSAudioCore
+    dependencies:
+      - sdk: AppKit.framework
+      - sdk: CoreAudio.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.vanille.lsaudio.core
+        PRODUCT_NAME: LSAudioCore
+        DEFINES_MODULE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 5
+        MARKETING_VERSION: 1.1.0
+
+  LSAudio:
+    type: application
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: LSAudioApp/Sources
+      - path: LSAudioApp/Resources
+        excludes:
+          - Info.plist
+    dependencies:
+      - target: LSAudioCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.vanille.lsaudio
+        PRODUCT_NAME: LSAudio
+        PRODUCT_MODULE_NAME: LSAudio
+        INFOPLIST_FILE: LSAudioApp/Resources/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: NANNL9SK66
+        CURRENT_PROJECT_VERSION: 5
+        MARKETING_VERSION: 1.1.0
+        GENERATE_INFOPLIST_FILE: NO
+      configs:
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+    preBuildScripts:
+      - name: Generate localized resources
+        basedOnDependencyAnalysis: false
+        script: |
+          /opt/homebrew/bin/shark generate "$PROJECT_FILE_PATH" "$PROJECT_DIR/LSAudioApp/Resources/Shark.swift" --target LSAudio --framework swiftui --name R
+    postBuildScripts:
+      - name: Stamp build number
+        basedOnDependencyAnalysis: false
+        script: |
+          if BUILD_NUMBER=$(git -C "$SRCROOT/.." rev-list --count HEAD 2>/dev/null); then
+            /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          fi
+    scheme:
+      testTargets: []
+      environmentVariables:
+        OS_ACTIVITY_MODE: disabled

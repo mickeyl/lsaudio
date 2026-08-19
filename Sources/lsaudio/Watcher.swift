@@ -1,6 +1,6 @@
-import CoreAudio
 import Dispatch
 import Foundation
+import LSAudioCore
 
 /// Event-driven live view: listens for coreaudiod process registrations and
 /// per-process running-state changes, then redraws (TTY) or emits change
@@ -11,16 +11,10 @@ final class Watcher {
     private let paths: Bool
     private let plainEvents: Bool
     private let style: OutputStyle
-    private let queue = DispatchQueue(label: "lsaudio.watch")
-
     private var current: [pid_t: AudioProcess] = [:]
-    private var listenedObjects: Set<AudioObjectID> = []
-    private var pendingRefresh: DispatchWorkItem?
     private var signalSource: DispatchSourceSignal?
-
-    private lazy var listener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
-        self?.scheduleRefresh()
-    }
+    private var monitor: AudioProcessMonitor?
+    private var isInitialSnapshot = true
 
     init(all: Bool, pattern: String?, paths: Bool, plainEvents: Bool, style: OutputStyle) {
         self.all = all
@@ -32,30 +26,24 @@ final class Watcher {
 
     func run() -> Never {
         installSignalHandler()
-        var address = CoreAudioProperty.address(for: kAudioHardwarePropertyProcessObjectList)
-        AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue, listener)
         if !plainEvents {
             print("\u{1B}[?25l", terminator: "")
         }
-        queue.async { self.refresh(initial: true) }
+        let monitor = AudioProcessMonitor { [self] snapshot, _ in
+            self.refresh(snapshot: snapshot, initial: self.isInitialSnapshot)
+            self.isInitialSnapshot = false
+        }
+        self.monitor = monitor
+        monitor.start()
         dispatchMain()
     }
 
-    // Listener callbacks arrive on our serial queue, so all state below is queue-confined.
-
-    private func scheduleRefresh() {
-        pendingRefresh?.cancel()
-        let work = DispatchWorkItem { [weak self] in self?.refresh(initial: false) }
-        pendingRefresh = work
-        // CoreAudio fires bursts of property changes; coalesce them into one redraw.
-        queue.asyncAfter(deadline: .now() + .milliseconds(150), execute: work)
-    }
-
-    private func refresh(initial: Bool) {
-        let snapshot = AudioProcess.snapshot()
-        updateProcessListeners(for: snapshot)
-
-        let selected = List.selectedProcesses(all: all, pattern: pattern)
+    private func refresh(snapshot: [AudioProcess], initial: Bool) {
+        let selected = AudioProcessQuery.selected(
+            from: snapshot,
+            includeIdle: all,
+            pattern: pattern
+        )
         let selectedByPID = Dictionary(selected.map { ($0.pid, $0) }, uniquingKeysWith: { first, _ in first })
 
         if plainEvents {
@@ -64,22 +52,6 @@ final class Watcher {
             redraw(selected)
         }
         current = selectedByPID
-    }
-
-    private func updateProcessListeners(for snapshot: [AudioProcess]) {
-        let snapshotIDs = Set(snapshot.map(\.objectID))
-        var outputAddress = CoreAudioProperty.address(for: kAudioProcessPropertyIsRunningOutput)
-        var inputAddress = CoreAudioProperty.address(for: kAudioProcessPropertyIsRunningInput)
-
-        for objectID in snapshotIDs.subtracting(listenedObjects) {
-            AudioObjectAddPropertyListenerBlock(objectID, &outputAddress, queue, listener)
-            AudioObjectAddPropertyListenerBlock(objectID, &inputAddress, queue, listener)
-        }
-        for objectID in listenedObjects.subtracting(snapshotIDs) {
-            AudioObjectRemovePropertyListenerBlock(objectID, &outputAddress, queue, listener)
-            AudioObjectRemovePropertyListenerBlock(objectID, &inputAddress, queue, listener)
-        }
-        listenedObjects = snapshotIDs
     }
 
     private func redraw(_ processes: [AudioProcess]) {

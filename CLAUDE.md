@@ -14,8 +14,14 @@ One file per concern, no shared mutable state:
 - `Watcher.swift` — event-driven watch mode via CoreAudio property listeners (no polling)
 - `AudioProcess.swift` — model; one coreaudiod client process
 - `CoreAudioProperty.swift` — typed wrappers around AudioObjectGetPropertyData
+- `AudioProcessMonitor.swift` — shared push-driven CoreAudio snapshot monitor
+- `AudioProcessExport.swift`, `AudioSignal.swift` — shared CLI/app contracts
 - `ProcessRenderer.swift` — table / plain / JSON rendering
 - `Table.swift`, `OutputStyle.swift` — box-drawing table and ANSI/TTY/NO_COLOR handling
+
+The shared files live in `Sources/LSAudioCore`; both the CLI target and native
+macOS app compile that module. The app lives in `macOS/`, uses XcodeGen as its
+project source of truth, targets macOS 26, and localizes UI copy through Shark.
 
 ## CoreAudio notes
 
@@ -40,9 +46,27 @@ One file per concern, no shared mutable state:
 - `make build` / `make smoke` — smoke test runs end-to-end against a *silent*
   afplay (generated WAV), so tests never make noise.
 - `make install` installs to `~/.local` by default (`PREFIX` overridable).
+- `make mac-build` / `make mac-test` / `make mac-run` build, test, and launch
+  the native menu-bar app.
 
-## Releasing
+## Releasing the CLI
 
 1. Bump `version` in `LSAudio.swift` and the `.TH` line in `lsaudio.1`
 2. Commit and push (branch: `master`)
 3. `gh release create v<version> --title "v<version>" --notes "<summary>"`
+
+## Releasing the macOS App
+
+The app shares the CLI marketing version but uses its own release tag
+`macos-v<version>`.
+
+1. Set `MARKETING_VERSION` for both targets in `macOS/project.yml`.
+2. Commit and push the release state. The app build number is stamped from the
+   Git commit count.
+3. Run `make smoke`, `make mac-test`, and `make mac-build`.
+4. Run `make mac-release NOTARY_PROFILE=NOTARIZE`.
+5. Upload the exact `macOS/Dist/LSAudio-<version>-macOS.zip` archive to a GitHub
+   release tagged `macos-v<version>`.
+6. Update and validate `Formula/lsaudio.rb` plus
+   `Casks/lsaudio-menubar.rb` in `../homebrew-formulae`, then commit and push
+   that repository without including unrelated working-tree changes.

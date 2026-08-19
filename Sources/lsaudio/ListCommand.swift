@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import LSAudioCore
 
 struct List: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -59,15 +60,11 @@ struct List: ParsableCommand {
     }
 
     static func selectedProcesses(all: Bool, pattern: String?) -> [AudioProcess] {
-        var processes = AudioProcess.snapshot()
-        if !all {
-            processes = processes.filter(\.isActive)
-        }
-        guard let pattern else { return processes }
-        return processes.filter {
-            $0.name.localizedCaseInsensitiveContains(pattern)
-                || ($0.bundleID?.localizedCaseInsensitiveContains(pattern) ?? false)
-        }
+        AudioProcessQuery.selected(
+            from: AudioProcess.snapshot(),
+            includeIdle: all,
+            pattern: pattern
+        )
     }
 
     private var emptyMessage: String {

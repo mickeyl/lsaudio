@@ -1,6 +1,7 @@
 import ArgumentParser
 import Darwin
 import Foundation
+import LSAudioCore
 
 struct Kill: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -15,11 +16,6 @@ struct Kill: ParsableCommand {
         confirmation was impossible, 3 if sending a signal failed.
         """
     )
-
-    private static let signalsByName: [String: Int32] = [
-        "HUP": SIGHUP, "INT": SIGINT, "QUIT": SIGQUIT, "KILL": SIGKILL,
-        "TERM": SIGTERM, "USR1": SIGUSR1, "USR2": SIGUSR2, "STOP": SIGSTOP, "CONT": SIGCONT,
-    ]
 
     @Argument(help: "A PID, a bundle ID, or a case-insensitive name substring. Omit to match every active audio process.")
     var target: String?
@@ -99,21 +95,11 @@ struct Kill: ParsableCommand {
     }
 
     static func matches(for target: String?, all: Bool) -> [AudioProcess] {
-        let candidates = List.selectedProcesses(all: all, pattern: nil)
-        let matched: [AudioProcess] = if let target {
-            if let pid = pid_t(target) {
-                candidates.filter { $0.pid == pid }
-            } else {
-                candidates.filter {
-                    $0.name.localizedCaseInsensitiveContains(target)
-                        || ($0.bundleID?.localizedCaseInsensitiveContains(target) ?? false)
-                }
-            }
-        } else {
-            candidates
-        }
-        // Never offer to kill ourselves, even if the pattern matches.
-        return matched.filter { $0.pid != getpid() }
+        AudioProcessQuery.matches(
+            from: AudioProcess.snapshot(),
+            target: target,
+            includeIdle: all
+        )
     }
 
     private func confirm(matches: [AudioProcess], signalLabel: String) throws {
@@ -166,28 +152,17 @@ struct Kill: ParsableCommand {
     }
 
     private func parsedSignal() throws -> (number: Int32, label: String) {
-        if let number = Int32(signalName) {
-            guard number > 0, number < NSIG else {
-                throw ValidationError("Signal number \(number) is out of range (1–\(NSIG - 1)).")
-            }
-            let name = Self.signalsByName.first { $0.value == number }?.key
-            return (number, name.map { "SIG\($0)" } ?? "signal \(number)")
-        }
-        var name = signalName.uppercased()
-        if name.hasPrefix("SIG") { name.removeFirst(3) }
-        guard let number = Self.signalsByName[name] else {
-            let known = Self.signalsByName.keys.sorted().joined(separator: ", ")
+        do {
+            let signal = try AudioSignal.parse(signalName)
+            let label = signal.name.isEmpty ? "signal \(signal.number)" : signal.label
+            return (signal.number, label)
+        } catch let AudioSignalError.outOfRange(number, maximum) {
+            throw ValidationError("Signal number \(number) is out of range (1–\(maximum)).")
+        } catch AudioSignalError.unknown {
+            let known = AudioSignal.supported.map(\.name).sorted().joined(separator: ", ")
             throw ValidationError("Unknown signal «\(signalName)». Use a number or one of: \(known).")
+        } catch {
+            throw ValidationError(error.localizedDescription)
         }
-        return (number, "SIG\(name)")
-    }
-}
-
-private extension AudioProcess {
-    var described: String {
-        // Without a bundle ID, the executable path is the next-best identity hint
-        // (it unmasks e.g. simulator daemons under /Library/Developer/CoreSimulator).
-        let origin = (bundleID ?? executablePath).map { " (\($0))" } ?? ""
-        return "\(name)\(origin), PID \(pid) — \(activityDescription)"
     }
 }
