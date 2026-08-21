@@ -33,7 +33,7 @@
 "Status_NO_OUTPUT" = "Derzeit gibt kein Prozess Audio wieder.";
 "Status_NO_INPUT" = "Derzeit nimmt kein Prozess Audio auf.";
 "Status_NO_RESULTS" = "Kein Audio-Prozess entspricht dem aktuellen Filter.";
-"Status_MONITOR_NOTE" = "CoreAudio-Mitteilungen halten die Liste ohne Polling aktuell.";
+"Status_MONITOR_NOTE" = "CoreAudio-Mitteilungen und regelmäßige Prüfungen halten diese Liste aktuell.";
 
 "Scope_PLAYING" = "Wiedergabe";
 "Scope_RECORDING" = "Aufnahme";

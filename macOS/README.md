@@ -22,9 +22,9 @@ LSAudio for macOS is a native macOS 26 menu-bar app built on the same `LSAudioCo
 
 ## Architecture
 
-- `LSAudioCore` owns CoreAudio discovery, event-driven monitoring, filtering, signal parsing, and CLI-compatible export formatting.
+- `LSAudioCore` owns CoreAudio discovery, property-listener monitoring, filtering, signal parsing, and CLI-compatible export formatting.
 - `AppModel` is the main-actor UI state boundary and receives snapshots from `AudioProcessMonitor`.
-- The app performs an initial scan at launch, then relies on CoreAudio property listeners; it does not poll.
+- The app performs an initial scan at launch and reacts immediately to CoreAudio property listeners. A fallback scan runs every two seconds, or every second while the menu-bar panel is open, because macOS does not notify every activity transition reliably.
 - The `LSUIElement` app stays out of the Dock and opens its process window on demand.
 
 ## Build and test

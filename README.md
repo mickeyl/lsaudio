@@ -105,8 +105,9 @@ Two notorious indirections, learned the hard way:
 
 The app lives in [`macOS/`](macOS/README.md) and performs an initial CoreAudio
 scan as soon as it launches. Its menu-bar label shows the number of processes
-playing and recording as `output·input`; CoreAudio property listeners keep the
-label, popover, process table, and event history current without polling.
+playing and recording as `output·input`. CoreAudio property listeners trigger
+immediate updates, while a lightweight fallback scan runs every two seconds or
+every second while the popover is open to catch notifications macOS omits.
 
 The compact panel separates playback and recording activity. The full process
 window adds registered idle clients, search, executable paths, process details,
@@ -117,6 +118,17 @@ and administrator authorization for protected processes are supported.
 <p align="center">
   <img src="docs/images/lsaudio-menubar.png" alt="LSAudio for macOS menu-bar popover showing processes currently playing audio and quick termination controls" width="390">
 </p>
+
+### What's new in 1.1.1
+
+- Adds an adaptive verification scan every two seconds, increasing to once per
+  second while the popover is open, to catch CoreAudio notifications macOS
+  occasionally omits.
+- Refreshes immediately whenever the popover opens.
+- Adds a dedicated macOS app icon for Spotlight, Finder, and other system
+  surfaces.
+
+See the complete [changelog](CHANGELOG.md) for release history.
 
 For local development, install XcodeGen and Shark, then use:
 

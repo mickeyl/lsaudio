@@ -14,7 +14,7 @@ One file per concern, no shared mutable state:
 - `Watcher.swift` — event-driven watch mode via CoreAudio property listeners (no polling)
 - `AudioProcess.swift` — model; one coreaudiod client process
 - `CoreAudioProperty.swift` — typed wrappers around AudioObjectGetPropertyData
-- `AudioProcessMonitor.swift` — shared push-driven CoreAudio snapshot monitor
+- `AudioProcessMonitor.swift` — shared CoreAudio snapshot monitor with property listeners and explicit refresh requests
 - `AudioProcessExport.swift`, `AudioSignal.swift` — shared CLI/app contracts
 - `ProcessRenderer.swift` — table / plain / JSON rendering
 - `Table.swift`, `OutputStyle.swift` — box-drawing table and ANSI/TTY/NO_COLOR handling
@@ -22,6 +22,8 @@ One file per concern, no shared mutable state:
 The shared files live in `Sources/LSAudioCore`; both the CLI target and native
 macOS app compile that module. The app lives in `macOS/`, uses XcodeGen as its
 project source of truth, targets macOS 26, and localizes UI copy through Shark.
+The app supplements CoreAudio notifications with an adaptive fallback scan:
+every two seconds normally and every second while the menu-bar panel is open.
 
 ## CoreAudio notes
 

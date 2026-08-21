@@ -26,7 +26,11 @@ struct MenuBarPanel: View {
             actions
         }
         .frame(width: LSAudioMetrics.menuWidth, height: LSAudioMetrics.menuHeight)
-        .onAppear { model.start() }
+        .onAppear {
+            model.start()
+            model.setMenuBarPanelVisible(true)
+        }
+        .onDisappear { model.setMenuBarPanelVisible(false) }
         .alert(R.L.Error_TITLE, isPresented: errorPresented) {
             Button(R.L.Error_DISMISS) { model.errorMessage = nil }
         } message: {

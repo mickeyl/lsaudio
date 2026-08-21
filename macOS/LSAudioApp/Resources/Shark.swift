@@ -295,7 +295,7 @@ public enum R {
         /// Reading CoreAudio…
         public static var Status_LOADING: String { return NSLocalizedString("Status_LOADING", bundle: bundle, comment: "") }
 
-        /// CoreAudio notifications keep this list current without polling.
+        /// CoreAudio notifications and periodic verification keep this list current.
         public static var Status_MONITOR_NOTE: String { return NSLocalizedString("Status_MONITOR_NOTE", bundle: bundle, comment: "") }
 
         /// No process is currently playing or recording audio.

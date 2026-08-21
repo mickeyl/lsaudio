@@ -17,7 +17,7 @@ struct LSAudio: ParsableCommand {
         Audio activity is read from coreaudiod's process objects \
         (CoreAudio process object API, macOS 14+).
         """,
-        version: "1.1.0",
+        version: "1.1.1",
         subcommands: [List.self, Kill.self],
         defaultSubcommand: List.self
     )

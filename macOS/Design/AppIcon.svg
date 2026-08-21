@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="170" y1="115" x2="860" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5148e9"/>
+      <stop offset="1" stop-color="#13b8fa"/>
+    </linearGradient>
+    <linearGradient id="highlight" x1="512" y1="70" x2="512" y2="550" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="iconShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="glyphShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#252078" flood-opacity="0.38"/>
+    </filter>
+    <clipPath id="tile">
+      <rect x="70" y="56" width="884" height="884" rx="205"/>
+    </clipPath>
+  </defs>
+
+  <rect x="92" y="82" width="840" height="862" rx="190" fill="#27216f" opacity="0.32" filter="url(#iconShadow)"/>
+  <rect x="70" y="56" width="884" height="884" rx="205" fill="url(#background)"/>
+  <g clip-path="url(#tile)">
+    <circle cx="185" cy="175" r="365" fill="#b29aff" opacity="0.18"/>
+    <circle cx="860" cy="875" r="390" fill="#0075d5" opacity="0.17"/>
+    <rect x="70" y="56" width="884" height="520" fill="url(#highlight)"/>
+  </g>
+  <rect x="72" y="58" width="880" height="880" rx="203" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4"/>
+
+  <g fill="#ffffff" filter="url(#glyphShadow)">
+    <rect x="260" y="412" width="64" height="200" rx="32"/>
+    <rect x="370" y="332" width="64" height="360" rx="32"/>
+    <rect x="480" y="242" width="64" height="540" rx="32"/>
+    <rect x="590" y="332" width="64" height="360" rx="32"/>
+    <rect x="700" y="412" width="64" height="200" rx="32"/>
+  </g>
+</svg>

@@ -57,7 +57,9 @@ final class AppModel {
     }
 
     @ObservationIgnored private var monitor: AudioProcessMonitor?
+    @ObservationIgnored private var pollingTask: Task<Void, Never>?
     @ObservationIgnored private var hasStarted = false
+    @ObservationIgnored private var isMenuBarPanelVisible = false
     @ObservationIgnored private var previousByPID: [pid_t: AudioProcess] = [:]
 
     init() {
@@ -68,6 +70,11 @@ final class AppModel {
         confirmsQuickTermination = UserDefaults.standard.object(
             forKey: Self.confirmsQuickTerminationKey
         ) == nil || UserDefaults.standard.bool(forKey: Self.confirmsQuickTerminationKey)
+    }
+
+    deinit {
+        pollingTask?.cancel()
+        monitor?.stop()
     }
 
     var activeProcesses: [AudioProcess] { processes.filter(\.isActive) }
@@ -105,6 +112,16 @@ final class AppModel {
         }
         self.monitor = monitor
         monitor.start()
+        restartPolling()
+    }
+
+    func setMenuBarPanelVisible(_ isVisible: Bool) {
+        guard isMenuBarPanelVisible != isVisible else { return }
+        isMenuBarPanelVisible = isVisible
+        restartPolling()
+        if isVisible, lastUpdated != nil {
+            monitor?.requestRefresh()
+        }
     }
 
     func refresh() {
@@ -161,9 +178,26 @@ final class AppModel {
         previousByPID = Dictionary(snapshot.map { ($0.pid, $0) }, uniquingKeysWith: { first, _ in first })
         lastUpdated = capturedAt
         isLoading = false
-        errorMessage = nil
         if let selectedPID, !snapshot.contains(where: { $0.pid == selectedPID }) {
             self.selectedPID = nil
+        }
+    }
+
+    private func restartPolling() {
+        pollingTask?.cancel()
+        guard let monitor else { return }
+        let interval = isMenuBarPanelVisible
+            ? Self.panelVisiblePollingInterval
+            : Self.panelHiddenPollingInterval
+        pollingTask = Task {
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: interval)
+                } catch {
+                    return
+                }
+                monitor.requestRefresh()
+            }
         }
     }
 
@@ -258,4 +292,6 @@ final class AppModel {
     private static let showPathsKey = "showExecutablePaths"
     private static let sortOrderKey = "processSortOrder"
     private static let confirmsQuickTerminationKey = "confirmsQuickTermination"
+    private static let panelVisiblePollingInterval = Duration.seconds(1)
+    private static let panelHiddenPollingInterval = Duration.seconds(2)
 }

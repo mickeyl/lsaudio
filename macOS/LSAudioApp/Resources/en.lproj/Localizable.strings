@@ -33,7 +33,7 @@
 "Status_NO_OUTPUT" = "No process is currently playing audio.";
 "Status_NO_INPUT" = "No process is currently recording audio.";
 "Status_NO_RESULTS" = "No audio process matches the current filter.";
-"Status_MONITOR_NOTE" = "CoreAudio notifications keep this list current without polling.";
+"Status_MONITOR_NOTE" = "CoreAudio notifications and periodic verification keep this list current.";
 
 "Scope_PLAYING" = "Playing";
 "Scope_RECORDING" = "Recording";
